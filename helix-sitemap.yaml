@@ -1,0 +1,7 @@
+version: 1
+
+sitemaps:
+  blog:
+    origin: https://main--aem-boilerplate-summitjapan--manji6.aem.live/
+    source: /query-index.json
+    destination: /sitemap.xml
