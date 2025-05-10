@@ -1,9 +1,9 @@
 # Your Project's Title...
-Your project's description...
+Adobe Summit Japan 用に使う動作環境として
 
 ## Environments
-- Preview: https://main--{repo}--{owner}.aem.page/
-- Live: https://main--{repo}--{owner}.aem.live/
+- Preview: https://dev--aem-boilerplate-summitjapan--manji6.aem.page/
+- Live: https://dev--aem-boilerplate-summitjapan--manji6.aem.live/
 
 ## Documentation
 
