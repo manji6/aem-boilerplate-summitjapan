@@ -26,7 +26,3 @@ indices:
         select: none
         value: |
           parseTimestamp(headers['last-modified'], 'ddd, DD MMM YYYY hh:mm:ss GMT')
-      tag:
-        select: head > meta[name="tag"]
-        value: |
-          attribute(el, 'content')
