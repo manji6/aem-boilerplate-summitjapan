@@ -108,6 +108,9 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
+  
+  // Start Tags loading early (non-blocking)
+  setTimeout(loadTags, 500); // 0.5秒後に読み込み開始
 }
 
 /**
@@ -116,8 +119,42 @@ async function loadLazy(doc) {
  */
 function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
-  window.setTimeout(() => import('./delayed.js'), 3000);
+  window.setTimeout(() => {
+    // Load Tags if not already loaded
+    if (!tagsLoaded) {
+      if (document.readyState === 'complete') {
+        loadTags();
+      } else {
+        window.addEventListener('load', loadTags);
+      }
+    }
+    
+    return import('./delayed.js');
+  }, 1000); // 3秒から1秒に短縮
   // load anything that can be postponed to the latest here
+}
+
+/**
+ * Load Tags(Launch) safely
+ */
+let tagsLoaded = false;
+
+function loadTags() {
+  if (tagsLoaded) return; // Prevent duplicate loading
+  
+  try {
+    const script = document.createElement('script');
+    script.src = 'https://assets.adobedtm.com/075dc62c985c/9f33a4631af8/launch-056d6498c666-development.min.js';
+    script.async = true;
+    script.onerror = (err) => console.error('Error loading Tags:', err);
+    script.onload = () => {
+      console.log('Tags loaded successfully');
+      tagsLoaded = true;
+    };
+    document.head.appendChild(script);
+  } catch (error) {
+    console.error('Error in loadTags:', error);
+  }
 }
 
 async function loadPage() {
