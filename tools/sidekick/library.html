@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -19,8 +19,10 @@
         background-color: #ededed;
         height: 100%;
       }
-      
-      helix-sidekick { display: none }
+
+      helix-sidekick {
+        display: none;
+      }
     </style>
     <title>Sidekick Library</title>
   </head>
@@ -31,12 +33,12 @@
       src="https://www.aem.live/tools/sidekick/library/index.js"
     ></script>
     <script>
-      const library = document.createElement('sidekick-library')
+      const library = document.createElement('sidekick-library');
       library.config = {
         base: '/tools/sidekick/library.json',
-      }
+      };
 
-      document.body.prepend(library)
+      document.body.prepend(library);
     </script>
   </body>
 </html>

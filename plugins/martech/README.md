@@ -30,8 +30,8 @@ The AEM Marketing Technology plugin helps you quickly set up a complete MarTech 
     - [`initRumTracking(sampleRUM, options)`](#initrumtrackingsamplerum-options)
     - [`isPersonalizationEnabled()`](#ispersonalizationenabled)
   - [Consent Management](#consent-management)
-      - [Integrating with AEM Consent Banner Block](#integrating-with-aem-consent-banner-block)
-      - [Integrating with OneTrust](#integrating-with-onetrust)
+    - [Integrating with AEM Consent Banner Block](#integrating-with-aem-consent-banner-block)
+    - [Integrating with OneTrust](#integrating-with-onetrust)
   - [Working with Dynamic Content (SPAs)](#working-with-dynamic-content-spas)
   - [FAQ](#faq)
     - [Why not use the default Adobe Launch approach?](#why-not-use-the-default-adobe-launch-approach)
@@ -66,6 +66,7 @@ The AEM MarTech plugin is essentially a wrapper around the Adobe Experience Plat
 - 🚩 Adobe Experience Platform Tags (a.k.a. Launch): to track your custom events
 
 Its key differentiators are:
+
 - 🌍 **Experience Platform enabled**: The library fully integrates with our main Adobe Experience Platform and all the services of our ecosystem.
 - 🚀 **Extremely fast**: The library is optimized to reduce load delay, TBT, and CLS, and has a minimal impact on your Core Web Vitals.
 - 👤 **Privacy-first**: The library does not track end-users by default and can be easily integrated with your preferred consent management system.
@@ -74,6 +75,7 @@ Its key differentiators are:
 ## Prerequisites
 
 You need access to:
+
 - **Adobe Experience Platform** (no full license needed, just basic permissions for data collection)
 - **Adobe Analytics**
 - **Adobe Target** or **Adobe Journey Optimizer**
@@ -85,9 +87,9 @@ You need access to:
 Before instrumenting your project, you must configure your Adobe Experience Platform Tags (Launch) container correctly for use with this plugin.
 
 - **DO NOT** include the following extensions in your Launch container:
-    - `Adobe Experience Platform Web SDK`
-    - `Adobe Analytics`
-    - `Adobe Target`
+  - `Adobe Experience Platform Web SDK`
+  - `Adobe Analytics`
+  - `Adobe Target`
 
 This plugin handles the initialization of these components directly to optimize performance. Including them in Launch will lead to conflicts and potential data duplication.
 
@@ -102,11 +104,13 @@ We also recommend using a proper consent management system.
 We have a comprehensive [tutorial on Experience League](https://experienceleague.adobe.com/en/docs/platform-learn/tutorial-one-adobe/assetmgmt/assetm1/ex6), or you can just follow the steps below.
 
 Add the plugin to your AEM project by running:
+
 ```sh
 git subtree add --squash --prefix plugins/martech git@github.com:adobe-rnd/aem-martech.git main
 ```
 
 If you later want to pull the latest changes and update your local copy of the plugin:
+
 ```sh
 git subtree pull --squash --prefix plugins/martech git@github.com:adobe-rnd/aem-martech.git main
 ```
@@ -114,6 +118,7 @@ git subtree pull --squash --prefix plugins/martech git@github.com:adobe-rnd/aem-
 If the `subtree pull` command fails, you can delete the `plugins/martech` folder and re-add it using the `git subtree add` command.
 
 If you use a linter, make sure to ignore minified files in your `.eslintignore`:
+
 ```
 *.min.js
 ```
@@ -125,16 +130,28 @@ To connect and configure the plugin, you'll need to edit your project's `head.ht
 ### 1. Add Preload Hints
 
 Add the following lines at the end of your `head.html` to speed up page load:
+
 ```html
-<link rel="preload" as="script" crossorigin="anonymous" href="/plugins/martech/src/index.js"/>
-<link rel="preload" as="script" crossorigin="anonymous" href="/plugins/martech/src/alloy.min.js"/>
-<link rel="preconnect" href="https://edge.adobedc.net"/>
+<link
+  rel="preload"
+  as="script"
+  crossorigin="anonymous"
+  href="/plugins/martech/src/index.js"
+/>
+<link
+  rel="preload"
+  as="script"
+  crossorigin="anonymous"
+  href="/plugins/martech/src/alloy.min.js"
+/>
+<link rel="preconnect" href="https://edge.adobedc.net" />
 <!-- Change to adobedc.demdex.net if you enable third-party cookies -->
 ```
 
 ### 2. Import Plugin Methods
 
 Import the necessary methods at the top of your `scripts.js` file:
+
 ```js
 import {
   initMartech,
@@ -203,6 +220,7 @@ if (main) {
 ### 5. Load Lazy Logic
 
 Add a reference to `martechLazy` just after the `loadFooter(…);` call in your `loadLazy` method:
+
 ```js
 async function loadLazy(doc) {
   // ...
@@ -215,6 +233,7 @@ async function loadLazy(doc) {
 ### 6. Load Delayed Logic
 
 Add a reference to `martechDelayed` in your `loadDelayed` method:
+
 ```js
 function loadDelayed() {
   window.setTimeout(() => {
@@ -231,6 +250,7 @@ The plugin exports several functions to interact with the marketing stack.
 ---
 
 ### `initMartech(webSDKConfig, martechConfig)`
+
 Initializes the library. This should be called once in `loadEager`.
 
 - **`webSDKConfig`** `{Object}`: Configuration for the Adobe Experience Platform WebSDK. Requires `datastreamId` and `orgId`.
@@ -249,6 +269,7 @@ Initializes the library. This should be called once in `loadEager`.
 ---
 
 ### `updateUserConsent(consent)`
+
 Sets user consent based on the IAB TCF 2.0 standard.
 
 - **`consent`** `{Object}`: An object detailing user consent choices (`collect`, `marketing`, `personalize`, `share`).
@@ -256,6 +277,7 @@ Sets user consent based on the IAB TCF 2.0 standard.
 ---
 
 ### `pushToDataLayer(payload)`
+
 Pushes a generic payload to the Adobe Client Data Layer.
 
 - **`payload`** `{Object}`: The data object to push.
@@ -263,6 +285,7 @@ Pushes a generic payload to the Adobe Client Data Layer.
 ---
 
 ### `pushEventToDataLayer(event, xdm, data, configOverrides)`
+
 A helper for pushing a standardized event to the data layer.
 
 - **`event`** `{String}`: The name of the event.
@@ -273,6 +296,7 @@ A helper for pushing a standardized event to the data layer.
 ---
 
 ### `sendEvent(payload)`
+
 A proxy for the `alloy('sendEvent', ...)` command to send a raw event.
 
 - **`payload`** `{Object}`: The full event payload for the WebSDK.
@@ -280,6 +304,7 @@ A proxy for the `alloy('sendEvent', ...)` command to send a raw event.
 ---
 
 ### `sendAnalyticsEvent(xdmData, dataMapping, configOverrides)`
+
 A helper for sending an analytics event directly.
 
 - **`xdmData`** `{Object}`: The XDM data object.
@@ -289,6 +314,7 @@ A helper for sending an analytics event directly.
 ---
 
 ### `initRumTracking(sampleRUM, options)`
+
 Initializes RUM (Real User Monitoring) tracking.
 
 - **`sampleRUM`** `{Object}`: The RUM sampling object.
@@ -297,6 +323,7 @@ Initializes RUM (Real User Monitoring) tracking.
 ---
 
 ### `isPersonalizationEnabled()`
+
 - **Returns** `{Boolean}`: `true` if personalization is configured and enabled.
 
 ---
@@ -306,7 +333,9 @@ Initializes RUM (Real User Monitoring) tracking.
 Connect your consent management system (CMS) to track user consent. Call `updateUserConsent` when your CMS sends a consent event.
 
 #### Integrating with AEM Consent Banner Block
+
 Example for the [AEM Consent Banner Block](https://github.com/adobe/aem-block-collection/pull/50):
+
 ```js
 function consentEventHandler(ev) {
   const collect = ev.detail.categories.includes('CC_ANALYTICS');
@@ -320,14 +349,16 @@ window.addEventListener('consent-updated', consentEventHandler);
 ```
 
 #### Integrating with OneTrust
+
 Example for [OneTrust](https://www.onetrust.com):
+
 ```js
 function consentEventHandler(ev) {
- const groups = ev.detail;
- const collect = groups.includes('C0002'); // Performance Cookies
- const personalize = groups.includes('C0003'); // Functional Cookies
- const share = groups.includes('C0008'); // Targeted Advertising
- updateUserConsent({ collect, personalize, share });
+  const groups = ev.detail;
+  const collect = groups.includes('C0002'); // Performance Cookies
+  const personalize = groups.includes('C0003'); // Functional Cookies
+  const share = groups.includes('C0008'); // Targeted Advertising
+  updateUserConsent({ collect, personalize, share });
 }
 window.addEventListener('consent.onetrust', consentEventHandler);
 ```
@@ -359,23 +390,29 @@ For Single Page Applications or pages with dynamic content, you may need to mana
 ## FAQ
 
 ### Why not use the default Adobe Launch approach?
+
 A default Launch implementation can negatively impact Core Web Vitals. Our approach optimizes for performance by loading components intelligently.
 
 ### Can't I just defer the Launch script?
+
 Deferring the entire script introduces content flickering for personalization use cases and can lead to missed analytics events from users who bounce early.
 
 ### Why is `git subtree` used for installation?
+
 `git subtree` is used to vendor the plugin's code directly into your project. This approach avoids the need for a package manager like `npm` and the complexities of `git submodule`, providing a simple way to pull in updates while keeping the code self-contained within your repository.
 
 ### What guarantees do I have that this won't break?
+
 This library uses the same official Adobe Experience Platform WebSDK and Adobe Client Data Layer as Launch. We are building on documented Adobe APIs, such as [top and bottom of page events](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/use-cases/top-bottom-page-events), to ensure compatibility.
 
 ### What's the catch?
+
 Since some logic is moved from the Launch UI into your project's code, not all features can be managed from the Launch UI. We recommend a baseline of the Core, ACDL, and AA via AEP Web SDK extensions in your Launch container.
 
 ## Dependencies
 
 This plugin includes the following core libraries:
+
 - **Adobe Experience Platform WebSDK**: `v2.28.0` (`alloy.min.js`)
 - **Adobe Client Data Layer**: `v2.0.2` (`acdl.min.js`)
 
@@ -388,6 +425,7 @@ This project manages the on-page, self-hosted implementation of the Adobe Experi
 In the AEP Web SDK extension settings within Adobe Launch, enable the **"Use existing alloy.js instance"** option.
 
 When this is checked:
+
 1.  The extension **will not** bundle a second copy of `alloy.js` into the Launch library.
 2.  The extension **will not** re-configure the SDK. It will use the instance that has already been configured on the page by this project.
 3.  All configuration settings within the Launch UI (e.g., Datastream ID, Org ID, Default Consent) will be ignored at runtime.
@@ -398,42 +436,42 @@ All SDK configuration must be handled within the scripts managed by this project
 
 All configuration is set within the `alloy("configure", { ... })` command. For a complete and official reference of all available options, please see the Adobe Experience League documentation, which is the source of truth.
 
-*   **Primary Documentation: [Configuring the Web SDK](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/index.html)**
+- **Primary Documentation: [Configuring the Web SDK](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/index.html)**
 
 The table below summarizes the most common settings that are now managed here instead of in the Launch UI, with direct links to their respective documentation pages.
 
-| Option | Description | Example Value |
-| :--- | :--- | :--- |
-| [`datastreamId`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/datastreamid) | The ID of the datastream to send data to. | `'YOUR_DATASTREAM_ID'` |
-| [`orgId`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/orgid) | Your Experience Cloud Organization ID. | `'YOUR_ORG_ID@AdobeOrg'` |
-| [`edgeDomain`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/edgedomain) | The first-party domain (CNAME) for interacting with Adobe services. | `'edge.your-domain.com'` |
-| [`defaultConsent`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/defaultconsent) | The default consent level (`in`, `out`, or `pending`). | `'pending'` |
-| [`idMigrationEnabled`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/idmigrationenabled) | Enables migration of visitor IDs from legacy Adobe libraries. | `true` |
-| [`targetMigrationEnabled`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/identity/id-migration/target-visitor-id) | Ensures visitor profile is maintained when migrating from `at.js`. | `true` |
-| [`onBeforeEventSend`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/onbeforeeventsend) | A callback function to modify event data before it's sent. | `(options) => { /* logic */ }` |
+| Option                                                                                                                                     | Description                                                         | Example Value                  |
+| :----------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------ | :----------------------------- |
+| [`datastreamId`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/datastreamid)                   | The ID of the datastream to send data to.                           | `'YOUR_DATASTREAM_ID'`         |
+| [`orgId`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/orgid)                                 | Your Experience Cloud Organization ID.                              | `'YOUR_ORG_ID@AdobeOrg'`       |
+| [`edgeDomain`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/edgedomain)                       | The first-party domain (CNAME) for interacting with Adobe services. | `'edge.your-domain.com'`       |
+| [`defaultConsent`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/defaultconsent)               | The default consent level (`in`, `out`, or `pending`).              | `'pending'`                    |
+| [`idMigrationEnabled`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/idmigrationenabled)       | Enables migration of visitor IDs from legacy Adobe libraries.       | `true`                         |
+| [`targetMigrationEnabled`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/identity/id-migration/target-visitor-id) | Ensures visitor profile is maintained when migrating from `at.js`.  | `true`                         |
+| [`onBeforeEventSend`](https://experienceleague.adobe.com/en/docs/experience-platform/web-sdk/commands/configure/onbeforeeventsend)         | A callback function to modify event data before it's sent.          | `(options) => { /* logic */ }` |
 
 ### Example On-Page Configuration
 
 Here is an example of how you might configure the SDK in your script:
 
 ```javascript
-alloy("configure", {
+alloy('configure', {
   // --- Required ---
-  datastreamId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-  orgId: "XXXXXXXXXXXXXXX@AdobeOrg",
+  datastreamId: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+  orgId: 'XXXXXXXXXXXXXXX@AdobeOrg',
 
   // --- Recommended ---
-  edgeDomain: "edge.your-site.com",
-  defaultConsent: "pending",
+  edgeDomain: 'edge.your-site.com',
+  defaultConsent: 'pending',
 
   // --- Optional: Migration & Callbacks ---
   idMigrationEnabled: true,
   targetMigrationEnabled: true,
-  onBeforeEventSend: function(options) {
+  onBeforeEventSend: function (options) {
     // This callback allows for last-minute modification
     // of the XDM payload before it is sent.
     // For example, adding a custom context:
-    options.xdm.customContext = "some value";
-  }
+    options.xdm.customContext = 'some value';
+  },
 });
-``` 
+```

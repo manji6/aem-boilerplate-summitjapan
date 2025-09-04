@@ -4,3 +4,4 @@ plugins/martech/src/*.min.css
 *.min.js
 *.min.css
 node_modules/
+plugins/martech/src/index.js

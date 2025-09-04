@@ -1,6 +1,9 @@
 import { loadFragment } from '../fragment/fragment.js';
 import {
-  buildBlock, decorateBlock, loadBlock, loadCSS,
+  buildBlock,
+  decorateBlock,
+  loadBlock,
+  loadCSS,
 } from '../../scripts/aem.js';
 
 /*
@@ -32,11 +35,14 @@ export async function createModal(contentNodes) {
 
   // close on click outside the dialog
   dialog.addEventListener('click', (e) => {
-    const {
-      left, right, top, bottom,
-    } = dialog.getBoundingClientRect();
+    const { left, right, top, bottom } = dialog.getBoundingClientRect();
     const { clientX, clientY } = e;
-    if (clientX < left || clientX > right || clientY < top || clientY > bottom) {
+    if (
+      clientX < left ||
+      clientX > right ||
+      clientY < top ||
+      clientY > bottom
+    ) {
       dialog.close();
     }
   });
@@ -54,7 +60,9 @@ export async function createModal(contentNodes) {
     showModal: () => {
       dialog.showModal();
       // reset scroll position
-      setTimeout(() => { dialogContent.scrollTop = 0; }, 0);
+      setTimeout(() => {
+        dialogContent.scrollTop = 0;
+      }, 0);
       document.body.classList.add('modal-open');
     },
   };

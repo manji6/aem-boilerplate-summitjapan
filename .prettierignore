@@ -4,3 +4,4 @@ node_modules/
 plugins/martech/src/*.min.js
 plugins/martech/src/*.min.css
 package-lock.json
+plugins/martech/src/index.js

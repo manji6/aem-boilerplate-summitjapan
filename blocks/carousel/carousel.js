@@ -10,7 +10,7 @@ function updateActiveSlide(slide) {
 
   slides.forEach((aSlide, idx) => {
     aSlide.setAttribute('aria-hidden', idx !== slideIndex);
-    aSlide.querySelectorAll('a').forEach(link => {
+    aSlide.querySelectorAll('a').forEach((link) => {
       if (idx !== slideIndex) {
         link.setAttribute('tabindex', '-1');
       } else {
@@ -37,7 +37,7 @@ function showSlide(block, slideIndex = 0) {
 
   activeSlide
     .querySelectorAll('a')
-    .forEach(link => link.removeAttribute('tabindex'));
+    .forEach((link) => link.removeAttribute('tabindex'));
   block.querySelector('.carousel-slides').scrollTo({
     top: 0,
     left: activeSlide.offsetLeft,
@@ -49,8 +49,8 @@ function bindEvents(block) {
   const slideIndicators = block.querySelector('.carousel-slide-indicators');
   if (!slideIndicators) return;
 
-  slideIndicators.querySelectorAll('button').forEach(button => {
-    button.addEventListener('click', e => {
+  slideIndicators.querySelectorAll('button').forEach((button) => {
+    button.addEventListener('click', (e) => {
       const slideIndicator = e.currentTarget.parentElement;
       const targetSlide = parseInt(slideIndicator.dataset.targetSlide, 10);
       showSlide(block, targetSlide);
@@ -71,7 +71,7 @@ function bindEvents(block) {
     });
   });
 
-  block.querySelector('.slide-prev').addEventListener('click', e => {
+  block.querySelector('.slide-prev').addEventListener('click', (e) => {
     const currentSlide = parseInt(block.dataset.activeSlide, 10);
     const totalSlides = block.querySelectorAll('.carousel-slide').length;
     const newSlide = currentSlide - 1 < 0 ? totalSlides - 1 : currentSlide - 1;
@@ -89,7 +89,7 @@ function bindEvents(block) {
     });
   });
 
-  block.querySelector('.slide-next').addEventListener('click', e => {
+  block.querySelector('.slide-next').addEventListener('click', (e) => {
     const currentSlide = parseInt(block.dataset.activeSlide, 10);
     const totalSlides = block.querySelectorAll('.carousel-slide').length;
     const newSlide = currentSlide + 1 >= totalSlides ? 0 : currentSlide + 1;
@@ -108,8 +108,8 @@ function bindEvents(block) {
   });
 
   const slideObserver = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
+    (entries) => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
           updateActiveSlide(entry.target);
         }
@@ -117,7 +117,7 @@ function bindEvents(block) {
     },
     { threshold: 0.5 },
   );
-  block.querySelectorAll('.carousel-slide').forEach(slide => {
+  block.querySelectorAll('.carousel-slide').forEach((slide) => {
     slideObserver.observe(slide);
   });
 }

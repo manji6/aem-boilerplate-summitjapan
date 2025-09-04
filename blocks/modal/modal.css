@@ -31,7 +31,7 @@ body.modal-open {
   .modal dialog {
     width: calc(100vw - 64px);
   }
-  
+
   .modal dialog .modal-content {
     max-height: calc(100dvh - (2 * var(--header-height)) - 64px);
     padding: 32px;
@@ -76,7 +76,7 @@ body.modal-open {
 }
 
 .modal .close-button .icon.icon-close::after {
-  transform: translate(-50%, -50%) rotate(-45deg)
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .modal dialog .section {

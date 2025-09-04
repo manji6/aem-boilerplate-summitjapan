@@ -19,7 +19,7 @@ import {
  */
 function initializeDataLayer() {
   window.adobeDataLayer = window.adobeDataLayer || [];
-  
+
   // Push initial page data
   window.adobeDataLayer.push({
     pageContext: {
@@ -31,18 +31,20 @@ function initializeDataLayer() {
     _experienceplatform: {
       identification: {
         core: {
-          ecid: sessionStorage.getItem("com.adobe.reactor.dataElements.ECID") || null
-        }
-      }
+          ecid:
+            sessionStorage.getItem('com.adobe.reactor.dataElements.ECID') ||
+            null,
+        },
+      },
     },
     web: {
       webPageDetails: {
         name: document.title,
         URL: window.location.href,
         server: window.location.hostname,
-        referrer: document.referrer
-      }
-    }
+        referrer: document.referrer,
+      },
+    },
   });
 }
 
@@ -53,16 +55,16 @@ let pageViewSent = false;
 
 function sendPageViewEvent() {
   if (!window.adobeDataLayer || pageViewSent) return;
-  
+
   window.adobeDataLayer.push({
     event: 'pageView',
     eventInfo: {
       pageName: document.title,
       pageURL: window.location.href,
-      timestamp: new Date().toISOString()
-    }
+      timestamp: new Date().toISOString(),
+    },
   });
-  
+
   pageViewSent = true;
   console.log('PageView event sent to Adobe Data Layer');
 }
@@ -75,30 +77,36 @@ function sendPageViewEvent() {
  * @param {string} elementId - ID or identifier of the element
  * @param {Object} additionalData - Additional data to include in the event
  */
-export function sendCustomEvent(event, eventName, elementType = 'unknown', elementId = '', additionalData = {}) {
+export function sendCustomEvent(
+  event,
+  eventName,
+  elementType = 'unknown',
+  elementId = '',
+  additionalData = {},
+) {
   if (!window.adobeDataLayer) return;
-  
+
   const target = event?.target || {};
   const elementText = target.textContent?.trim() || '';
   const elementHref = target.href || '';
-  
+
   window.adobeDataLayer.push({
     event: eventName,
     eventInfo: {
-      elementType: elementType,
+      elementType,
       elementId: elementId || target.id || target.className || 'unknown',
-      elementText: elementText,
-      elementHref: elementHref,
+      elementText,
+      elementHref,
       timestamp: new Date().toISOString(),
-      ...additionalData
-    }
+      ...additionalData,
+    },
   });
-  
+
   console.log(`${eventName} event sent to Adobe Data Layer:`, {
     elementType,
     elementId: elementId || target.id || target.className || 'unknown',
     elementText,
-    ...additionalData
+    ...additionalData,
   });
 }
 
@@ -109,7 +117,12 @@ export function sendCustomEvent(event, eventName, elementType = 'unknown', eleme
  * @param {string} elementId - ID or identifier of the element
  * @param {Object} additionalData - Additional data to include in the event
  */
-export function sendClickEvent(event, elementType = 'button', elementId = '', additionalData = {}) {
+export function sendClickEvent(
+  event,
+  elementType = 'button',
+  elementId = '',
+  additionalData = {},
+) {
   sendCustomEvent(event, 'click', elementType, elementId, additionalData);
 }
 
@@ -119,8 +132,10 @@ export function sendClickEvent(event, elementType = 'button', elementId = '', ad
  */
 function addClickListeners(container) {
   // Add listeners to buttons only
-  const buttons = container.querySelectorAll('button, .button, [role="button"]');
-  buttons.forEach(button => {
+  const buttons = container.querySelectorAll(
+    'button, .button, [role="button"]',
+  );
+  buttons.forEach((button) => {
     button.addEventListener('click', (event) => {
       sendClickEvent(event, 'button', button.id || button.className);
     });
@@ -135,7 +150,11 @@ function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
-  if (h1 && picture && (h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING)) {
+  if (
+    h1 &&
+    picture &&
+    h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING
+  ) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
@@ -148,7 +167,8 @@ function buildHeroBlock(main) {
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
+    if (!window.location.hostname.includes('localhost'))
+      sessionStorage.setItem('fonts-loaded', 'true');
   } catch (e) {
     // do nothing
   }
@@ -179,7 +199,7 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
-  
+
   // Add click listeners after decoration
   addClickListeners(main);
 }
@@ -191,10 +211,10 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
-  
+
   // Initialize Adobe Data Layer early
   initializeDataLayer();
-  
+
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -229,7 +249,7 @@ async function loadLazy(doc) {
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
-  
+
   // Start Tags loading early (non-blocking)
   setTimeout(loadTags, 500); // 0.5秒後に読み込み開始
 }
@@ -249,7 +269,7 @@ function loadDelayed() {
         window.addEventListener('load', loadTags);
       }
     }
-    
+
     return import('./delayed.js');
   }, 1000); // 3秒から1秒に短縮
   // load anything that can be postponed to the latest here
@@ -262,10 +282,11 @@ let tagsLoaded = false;
 
 function loadTags() {
   if (tagsLoaded) return; // Prevent duplicate loading
-  
+
   try {
     const script = document.createElement('script');
-    script.src = 'https://assets.adobedtm.com/075dc62c985c/9f33a4631af8/launch-056d6498c666-development.min.js';
+    script.src =
+      'https://assets.adobedtm.com/075dc62c985c/9f33a4631af8/launch-056d6498c666-development.min.js';
     script.async = true;
     script.onerror = (err) => console.error('Error loading Tags:', err);
     script.onload = () => {
@@ -282,7 +303,7 @@ async function loadPage() {
   await loadEager(document);
   await loadLazy(document);
   loadDelayed();
-  
+
   // Send PageView event when page is fully loaded and Tags are ready
   const sendPageViewWhenReady = () => {
     if (tagsLoaded) {
@@ -293,7 +314,7 @@ async function loadPage() {
       setTimeout(sendPageViewWhenReady, 200);
     }
   };
-  
+
   if (document.readyState === 'complete') {
     setTimeout(sendPageViewWhenReady, 500);
   } else {

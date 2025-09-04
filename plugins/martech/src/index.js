@@ -71,7 +71,9 @@ function promiseWithTimeout(promise, timeout = 1000) {
   let timer;
   return Promise.race([
     promise,
-    new Promise((_, reject) => { timer = setTimeout(reject, timeout); }),
+    new Promise((_, reject) => {
+      timer = setTimeout(reject, timeout);
+    }),
   ]).finally((result) => {
     clearTimeout(timer);
     return result;
@@ -84,7 +86,11 @@ function promiseWithTimeout(promise, timeout = 1000) {
  * @throws a decorated error that can be intercepted by RUM handlers.
  */
 function handleRejectedPromise(error) {
-  const [, file, line] = error.stack.split('\n')[1].trim().split(' ')[1].match(/(.*):(\d+):(\d+)/);
+  const [, file, line] = error.stack
+    .split('\n')[1]
+    .trim()
+    .split(' ')[1]
+    .match(/(.*):(\d+):(\d+)/);
   error.sourceURL = file;
   error.line = line;
   throw error;
@@ -136,7 +142,10 @@ function getDefaultAlloyConfiguration() {
   return {
     context: ['web', 'device', 'environment'],
     // enable while debugging
-    debugEnabled: hostname === 'localhost' || hostname.endsWith('.hlx.page') || hostname.endsWith('.aem.page'),
+    debugEnabled:
+      hostname === 'localhost'
+      || hostname.endsWith('.hlx.page')
+      || hostname.endsWith('.aem.page'),
     // wait for exlicit consent before tracking anything
     defaultConsent: 'pending',
   };
@@ -149,7 +158,10 @@ function getDefaultAlloyConfiguration() {
  */
 export async function sendEvent(payload) {
   // eslint-disable-next-line no-console
-  console.assert(config.alloyInstanceName && window[config.alloyInstanceName], 'Martech needs to be initialized before the `sendEvent` method is called');
+  console.assert(
+    config.alloyInstanceName && window[config.alloyInstanceName],
+    'Martech needs to be initialized before the `sendEvent` method is called',
+  );
   return window[config.alloyInstanceName]('sendEvent', payload);
 }
 
@@ -160,11 +172,21 @@ export async function sendEvent(payload) {
  * @param {Object} [configOverrides] optional config overrides
  * @returns {Promise<*>} a promise that the event was sent
  */
-export async function sendAnalyticsEvent(xdmData, dataMapping = {}, configOverrides = {}) {
+export async function sendAnalyticsEvent(
+  xdmData,
+  dataMapping = {},
+  configOverrides = {},
+) {
   // eslint-disable-next-line no-console
-  console.assert(config.alloyInstanceName && window[config.alloyInstanceName], 'Martech needs to be initialized before the `sendAnalyticsEvent` method is called');
+  console.assert(
+    config.alloyInstanceName && window[config.alloyInstanceName],
+    'Martech needs to be initialized before the `sendAnalyticsEvent` method is called',
+  );
   // eslint-disable-next-line no-console
-  console.assert(config.analytics, 'Analytics tracking is disabled in the martech config');
+  console.assert(
+    config.analytics,
+    'Analytics tracking is disabled in the martech config',
+  );
   try {
     return sendEvent({
       documentUnloading: true,
@@ -204,14 +226,22 @@ async function loadAndConfigureAlloy(instanceName, webSDKConfig) {
  */
 function onDecoratedElement(fn) {
   // Apply propositions to all already decorated blocks/sections
-  if (document.querySelector('[data-block-status="loaded"],[data-section-status="loaded"]')) {
+  if (
+    document.querySelector(
+      '[data-block-status="loaded"],[data-section-status="loaded"]',
+    )
+  ) {
     fn();
   }
 
   const observer = new MutationObserver((mutations) => {
-    if (mutations.some((m) => m.target.tagName === 'BODY'
-      || m.target.dataset.sectionStatus === 'loaded'
-      || m.target.dataset.blockStatus === 'loaded')) {
+    if (
+      mutations.some(
+        (m) => m.target.tagName === 'BODY'
+          || m.target.dataset.sectionStatus === 'loaded'
+          || m.target.dataset.blockStatus === 'loaded',
+      )
+    ) {
       fn();
     }
   });
@@ -233,7 +263,10 @@ function onDecoratedElement(fn) {
  */
 export function pushToDataLayer(payload) {
   // eslint-disable-next-line no-console
-  console.assert(config.dataLayerInstanceName && window[config.dataLayerInstanceName], 'Martech needs to be initialized before the `pushToDataLayer` method is called');
+  console.assert(
+    config.dataLayerInstanceName && window[config.dataLayerInstanceName],
+    'Martech needs to be initialized before the `pushToDataLayer` method is called',
+  );
   window[config.dataLayerInstanceName].push(payload);
 }
 
@@ -246,7 +279,10 @@ export function pushToDataLayer(payload) {
  */
 export function pushEventToDataLayer(event, xdm, data, configOverrides) {
   pushToDataLayer({
-    event, xdm, data, configOverrides,
+    event,
+    xdm,
+    data,
+    configOverrides,
   });
 }
 
@@ -294,7 +330,9 @@ async function loadAndConfigureDataLayer() {
       data = {};
     }
     if (!el.id) {
-      const index = [...document.querySelectorAll(`.${el.classList[0]}`)].indexOf(el);
+      const index = [
+        ...document.querySelectorAll(`.${el.classList[0]}`),
+      ].indexOf(el);
       el.id = `${data.parentId ? `${data.parentId}-` : ''}${index + 1}`;
     }
     window[config.dataLayerInstanceName].push({
@@ -322,7 +360,10 @@ async function loadAndConfigureDataLayer() {
  */
 export async function updateUserConsent(consent) {
   // eslint-disable-next-line no-console
-  console.assert(config.alloyInstanceName, 'Martech needs to be initialized before the `updateUserConsent` method is called');
+  console.assert(
+    config.alloyInstanceName,
+    'Martech needs to be initialized before the `updateUserConsent` method is called',
+  );
 
   let marketingConfig;
   if (typeof consent.marketing === 'boolean') {
@@ -348,18 +389,20 @@ export async function updateUserConsent(consent) {
     };
   }
   const fn = () => window[config.alloyInstanceName]('setConsent', {
-    consent: [{
-      standard: 'Adobe',
-      version: '2.0',
-      value: {
-        collect: { val: consent.collect ? 'y' : 'n' },
-        marketing: marketingConfig,
-        personalize: {
-          content: { val: consent.personalize ? 'y' : 'n' },
+    consent: [
+      {
+        standard: 'Adobe',
+        version: '2.0',
+        value: {
+          collect: { val: consent.collect ? 'y' : 'n' },
+          marketing: marketingConfig,
+          personalize: {
+            content: { val: consent.personalize ? 'y' : 'n' },
+          },
+          share: { val: consent.share ? 'y' : 'n' },
         },
-        share: { val: consent.share ? 'y' : 'n' },
       },
-    }],
+    ],
   });
   if (isAlloyConfigured) {
     return fn();
@@ -392,7 +435,8 @@ async function applyPropositions(instanceName) {
   if (!renderDecisionResponse?.propositions) {
     return [];
   }
-  let propositions = window.structuredClone(renderDecisionResponse.propositions)
+  let propositions = window
+    .structuredClone(renderDecisionResponse.propositions)
     .filter((p) => p.items.some(
       (i) => i.schema === 'https://ns.adobe.com/personalization/dom-action',
     ));
@@ -430,9 +474,15 @@ export async function initMartech(webSDKConfig, martechConfig = {}) {
   // eslint-disable-next-line no-console
   console.assert(!config, 'Martech already initialized.');
   // eslint-disable-next-line no-console
-  console.assert(webSDKConfig?.datastreamId || webSDKConfig?.edgeConfigId, 'Please set your "datastreamId" for the WebSDK config.');
+  console.assert(
+    webSDKConfig?.datastreamId || webSDKConfig?.edgeConfigId,
+    'Please set your "datastreamId" for the WebSDK config.',
+  );
   // eslint-disable-next-line no-console
-  console.assert(webSDKConfig?.orgId, 'Please set your "orgId" for the WebSDK config.');
+  console.assert(
+    webSDKConfig?.orgId,
+    'Please set your "orgId" for the WebSDK config.',
+  );
 
   config = {
     ...DEFAULT_CONFIG,
@@ -512,7 +562,10 @@ export function initRumTracking(sampleRUM, options = {}) {
   // Load the RUM enhancer so we can map all RUM events even on non-sampled pages
   if (options.withRumEnhancer) {
     const script = document.createElement('script');
-    script.src = new URL('.rum/@adobe/helix-rum-enhancer@^1/src/index.js', sampleRUM.baseURL).href;
+    script.src = new URL(
+      '.rum/@adobe/helix-rum-enhancer@^1/src/index.js',
+      sampleRUM.baseURL,
+    ).href;
     document.head.appendChild(script);
   }
 
@@ -577,31 +630,41 @@ export async function applyPersonalization(viewName) {
 export async function martechEager() {
   if (config.personalization && config.performanceOptimized) {
     // eslint-disable-next-line no-console
-    console.assert(config.alloyInstanceName && window[config.alloyInstanceName], 'Martech needs to be initialized before the `martechEager` method is called');
+    console.assert(
+      config.alloyInstanceName && window[config.alloyInstanceName],
+      'Martech needs to be initialized before the `martechEager` method is called',
+    );
     return promiseWithTimeout(
       applyPropositions(config.alloyInstanceName),
       config.personalizationTimeout,
-    ).then((result) => {
-      onPageActivation(() => {
-        // Automatically report displayed propositions
-        sendAnalyticsEvent({
-          eventType: 'web.webpagedetails.pageViews',
-          _experience: {
-            decisioning: {
-              propositions: response.propositions
-                .map((p) => ({ id: p.id, scope: p.scope, scopeDetails: p.scopeDetails })),
-              propositionEventType: { display: 1 },
+    )
+      .then((result) => {
+        onPageActivation(() => {
+          // Automatically report displayed propositions
+          sendAnalyticsEvent({
+            eventType: 'web.webpagedetails.pageViews',
+            _experience: {
+              decisioning: {
+                propositions: response.propositions.map((p) => ({
+                  id: p.id,
+                  scope: p.scope,
+                  scopeDetails: p.scopeDetails,
+                })),
+                propositionEventType: { display: 1 },
+              },
             },
-          },
+          });
         });
+        return result;
+      })
+      .catch(() => {
+        if (alloyConfig.debugEnabled) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            'Could not apply personalization in time. Either backend is taking too long, or user did not give consent in time.',
+          );
+        }
       });
-      return result;
-    }).catch(() => {
-      if (alloyConfig.debugEnabled) {
-        // eslint-disable-next-line no-console
-        console.warn('Could not apply personalization in time. Either backend is taking too long, or user did not give consent in time.');
-      }
-    });
   }
   if (config.personalization) {
     document.body.style.visibility = 'hidden';
@@ -624,7 +687,10 @@ export async function martechLazy() {
       sendAnalyticsEvent({ eventType: 'web.webpagedetails.pageViews' });
     });
   } else if (!config.performanceOptimized) {
-    const renderDecisionResponse = await sendEvent({ renderDecisions: true, decisionScopes: ['__view__'] });
+    const renderDecisionResponse = await sendEvent({
+      renderDecisions: true,
+      decisionScopes: ['__view__'],
+    });
     response = renderDecisionResponse;
     document.body.style.visibility = null;
     // Automatically report displayed propositions
@@ -640,9 +706,11 @@ export async function martechLazy() {
  */
 export async function martechDelayed() {
   // eslint-disable-next-line no-console
-  console.assert(config.alloyInstanceName && window[config.alloyInstanceName], 'Martech needs to be initialized before the `martechDelayed` method is called');
+  console.assert(
+    config.alloyInstanceName && window[config.alloyInstanceName],
+    'Martech needs to be initialized before the `martechDelayed` method is called',
+  );
 
   const { launchUrls } = config;
-  return Promise.all(launchUrls.map((url) => import(url)))
-    .catch((err) => handleRejectedPromise(new Error(err)));
+  return Promise.all(launchUrls.map((url) => import(url))).catch((err) => handleRejectedPromise(new Error(err)));
 }

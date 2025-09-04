@@ -3,6 +3,7 @@
 ## Development Setup
 
 ### Pre-commit Hooks
+
 This project uses pre-commit hooks to ensure code quality. The following checks run automatically before each commit:
 
 - **ESLint**: JavaScript code quality and style
@@ -38,14 +39,17 @@ npm run pre-commit
 ### Common Issues and Solutions
 
 #### Trailing Spaces
+
 - **Issue**: Lines ending with spaces
 - **Solution**: Run `npm run format` to automatically remove
 
 #### Missing Trailing Commas
+
 - **Issue**: Objects missing trailing commas
 - **Solution**: Run `npm run format` to automatically add
 
 #### ESLint Errors
+
 - **Issue**: JavaScript code quality issues
 - **Solution**: Run `npm run lint:fix` to automatically fix most issues
 

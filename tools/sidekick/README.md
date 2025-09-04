@@ -25,10 +25,12 @@ tools/sidekick/
 ## Configuration
 
 ### Blocks Configuration (library.csv)
+
 - `name`: Display name for the block
 - `path`: Path to the block definition file
 
 ### Plugins Configuration (plugins.csv)
+
 - `name`: Display name for the plugin
 - `path`: Path to the plugin JavaScript file
 

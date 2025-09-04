@@ -20,7 +20,7 @@ export default {
 export async function decorate(container, data, query, context) {
   // Show loader
   container.dispatchEvent(new CustomEvent(PLUGIN_EVENTS.SHOW_LOADER));
-  
+
   try {
     // Create plugin content
     const pluginContent = document.createElement('div');
@@ -39,9 +39,9 @@ export async function decorate(container, data, query, context) {
         </div>
       </div>
     `;
-    
+
     container.appendChild(pluginContent);
-    
+
     // Simulate loading tags
     setTimeout(() => {
       const tagsContainer = container.querySelector('#tags-container');
@@ -62,42 +62,49 @@ export async function decorate(container, data, query, context) {
         </div>
       `;
     }, 1000);
-    
+
     // Add tag functionality
     const addTagBtn = container.querySelector('#add-tag-btn');
     const newTagInput = container.querySelector('#new-tag-input');
-    
+
     addTagBtn.addEventListener('click', () => {
       const tagName = newTagInput.value.trim();
       if (tagName) {
         const tagsContainer = container.querySelector('#tags-container');
         const newTag = document.createElement('span');
-        newTag.style.cssText = 'background: #e9ecef; padding: 4px 8px; border-radius: 4px; margin-right: 8px; margin-bottom: 8px; display: inline-block;';
+        newTag.style.cssText =
+          'background: #e9ecef; padding: 4px 8px; border-radius: 4px; margin-right: 8px; margin-bottom: 8px; display: inline-block;';
         newTag.innerHTML = `
           ${tagName}
           <button onclick="this.parentElement.remove()" style="background: none; border: none; margin-left: 8px; cursor: pointer;">×</button>
         `;
         tagsContainer.appendChild(newTag);
         newTagInput.value = '';
-        
+
         // Show success toast
-        container.dispatchEvent(new CustomEvent(PLUGIN_EVENTS.TOAST, {
-          detail: { message: `Tag "${tagName}" added successfully!`, variant: 'positive' }
-        }));
+        container.dispatchEvent(
+          new CustomEvent(PLUGIN_EVENTS.TOAST, {
+            detail: {
+              message: `Tag "${tagName}" added successfully!`,
+              variant: 'positive',
+            },
+          }),
+        );
       }
     });
-    
+
     // Handle search
     if (query) {
       const tagsContainer = container.querySelector('#tags-container');
       tagsContainer.innerHTML = `<p>Searching for tags containing: "${query}"</p>`;
     }
-    
   } catch (error) {
     console.error('Error in Tags plugin:', error);
-    container.dispatchEvent(new CustomEvent(PLUGIN_EVENTS.TOAST, {
-      detail: { message: 'Error loading tags plugin', variant: 'negative' }
-    }));
+    container.dispatchEvent(
+      new CustomEvent(PLUGIN_EVENTS.TOAST, {
+        detail: { message: 'Error loading tags plugin', variant: 'negative' },
+      }),
+    );
   } finally {
     // Hide loader
     container.dispatchEvent(new CustomEvent(PLUGIN_EVENTS.HIDE_LOADER));
