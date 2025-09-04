@@ -1,0 +1,6 @@
+node_modules/
+*.min.js
+*.min.css
+plugins/martech/src/*.min.js
+plugins/martech/src/*.min.css
+package-lock.json

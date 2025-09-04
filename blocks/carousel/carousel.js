@@ -10,7 +10,7 @@ function updateActiveSlide(slide) {
 
   slides.forEach((aSlide, idx) => {
     aSlide.setAttribute('aria-hidden', idx !== slideIndex);
-    aSlide.querySelectorAll('a').forEach((link) => {
+    aSlide.querySelectorAll('a').forEach(link => {
       if (idx !== slideIndex) {
         link.setAttribute('tabindex', '-1');
       } else {
@@ -35,7 +35,9 @@ function showSlide(block, slideIndex = 0) {
   if (slideIndex >= slides.length) realSlideIndex = 0;
   const activeSlide = slides[realSlideIndex];
 
-  activeSlide.querySelectorAll('a').forEach((link) => link.removeAttribute('tabindex'));
+  activeSlide
+    .querySelectorAll('a')
+    .forEach(link => link.removeAttribute('tabindex'));
   block.querySelector('.carousel-slides').scrollTo({
     top: 0,
     left: activeSlide.offsetLeft,
@@ -47,30 +49,35 @@ function bindEvents(block) {
   const slideIndicators = block.querySelector('.carousel-slide-indicators');
   if (!slideIndicators) return;
 
-  slideIndicators.querySelectorAll('button').forEach((button) => {
-    button.addEventListener('click', (e) => {
+  slideIndicators.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', e => {
       const slideIndicator = e.currentTarget.parentElement;
       const targetSlide = parseInt(slideIndicator.dataset.targetSlide, 10);
       showSlide(block, targetSlide);
-      
+
       // Send ACDL event for slide indicator click
-      sendClickEvent(e, 'carousel-indicator', `carousel-${block.id}-indicator-${targetSlide}`, {
-        blockType: 'carousel',
-        action: 'slide-indicator-click',
-        targetSlide,
-        totalSlides: block.querySelectorAll('.carousel-slide').length,
-        carouselId: block.id
-      });
+      sendClickEvent(
+        e,
+        'carousel-indicator',
+        `carousel-${block.id}-indicator-${targetSlide}`,
+        {
+          blockType: 'carousel',
+          action: 'slide-indicator-click',
+          targetSlide,
+          totalSlides: block.querySelectorAll('.carousel-slide').length,
+          carouselId: block.id,
+        },
+      );
     });
   });
 
-  block.querySelector('.slide-prev').addEventListener('click', (e) => {
+  block.querySelector('.slide-prev').addEventListener('click', e => {
     const currentSlide = parseInt(block.dataset.activeSlide, 10);
     const totalSlides = block.querySelectorAll('.carousel-slide').length;
     const newSlide = currentSlide - 1 < 0 ? totalSlides - 1 : currentSlide - 1;
-    
+
     showSlide(block, newSlide);
-    
+
     // Send ACDL event for previous button click
     sendClickEvent(e, 'carousel-nav', `carousel-${block.id}-prev`, {
       blockType: 'carousel',
@@ -78,17 +85,17 @@ function bindEvents(block) {
       currentSlide,
       newSlide,
       totalSlides,
-      carouselId: block.id
+      carouselId: block.id,
     });
   });
-  
-  block.querySelector('.slide-next').addEventListener('click', (e) => {
+
+  block.querySelector('.slide-next').addEventListener('click', e => {
     const currentSlide = parseInt(block.dataset.activeSlide, 10);
     const totalSlides = block.querySelectorAll('.carousel-slide').length;
     const newSlide = currentSlide + 1 >= totalSlides ? 0 : currentSlide + 1;
-    
+
     showSlide(block, newSlide);
-    
+
     // Send ACDL event for next button click
     sendClickEvent(e, 'carousel-nav', `carousel-${block.id}-next`, {
       blockType: 'carousel',
@@ -96,18 +103,21 @@ function bindEvents(block) {
       currentSlide,
       newSlide,
       totalSlides,
-      carouselId: block.id
+      carouselId: block.id,
     });
   });
 
-  const slideObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        updateActiveSlide(entry.target);
-      }
-    });
-  }, { threshold: 0.5 });
-  block.querySelectorAll('.carousel-slide').forEach((slide) => {
+  const slideObserver = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          updateActiveSlide(entry.target);
+        }
+      });
+    },
+    { threshold: 0.5 },
+  );
+  block.querySelectorAll('.carousel-slide').forEach(slide => {
     slideObserver.observe(slide);
   });
 }
@@ -119,7 +129,9 @@ function createSlide(row, slideIndex, carouselId) {
   slide.classList.add('carousel-slide');
 
   row.querySelectorAll(':scope > div').forEach((column, colIdx) => {
-    column.classList.add(`carousel-slide-${colIdx === 0 ? 'image' : 'content'}`);
+    column.classList.add(
+      `carousel-slide-${colIdx === 0 ? 'image' : 'content'}`,
+    );
     slide.append(column);
   });
 
@@ -141,7 +153,10 @@ export default async function decorate(block) {
   const placeholders = await fetchPlaceholders();
 
   block.setAttribute('role', 'region');
-  block.setAttribute('aria-roledescription', placeholders.carousel || 'Carousel');
+  block.setAttribute(
+    'aria-roledescription',
+    placeholders.carousel || 'Carousel',
+  );
 
   const container = document.createElement('div');
   container.classList.add('carousel-slides-container');
@@ -153,7 +168,10 @@ export default async function decorate(block) {
   let slideIndicators;
   if (!isSingleSlide) {
     const slideIndicatorsNav = document.createElement('nav');
-    slideIndicatorsNav.setAttribute('aria-label', placeholders.carouselSlideControls || 'Carousel Slide Controls');
+    slideIndicatorsNav.setAttribute(
+      'aria-label',
+      placeholders.carouselSlideControls || 'Carousel Slide Controls',
+    );
     slideIndicators = document.createElement('ol');
     slideIndicators.classList.add('carousel-slide-indicators');
     slideIndicatorsNav.append(slideIndicators);
@@ -188,23 +206,35 @@ export default async function decorate(block) {
 
   if (!isSingleSlide) {
     bindEvents(block);
-    
+
     // Send ACDL event for carousel initialization
-    sendCustomEvent(null, 'carousel-init', 'carousel', `carousel-${carouselId}`, {
-      blockType: 'carousel',
-      action: 'carousel-initialized',
-      totalSlides: rows.length,
-      carouselId: `carousel-${carouselId}`,
-      hasNavigation: true
-    });
+    sendCustomEvent(
+      null,
+      'carousel-init',
+      'carousel',
+      `carousel-${carouselId}`,
+      {
+        blockType: 'carousel',
+        action: 'carousel-initialized',
+        totalSlides: rows.length,
+        carouselId: `carousel-${carouselId}`,
+        hasNavigation: true,
+      },
+    );
   } else {
     // Send ACDL event for single slide carousel
-    sendCustomEvent(null, 'carousel-init', 'carousel', `carousel-${carouselId}`, {
-      blockType: 'carousel',
-      action: 'carousel-initialized',
-      totalSlides: 1,
-      carouselId: `carousel-${carouselId}`,
-      hasNavigation: false
-    });
+    sendCustomEvent(
+      null,
+      'carousel-init',
+      'carousel',
+      `carousel-${carouselId}`,
+      {
+        blockType: 'carousel',
+        action: 'carousel-initialized',
+        totalSlides: 1,
+        carouselId: `carousel-${carouselId}`,
+        hasNavigation: false,
+      },
+    );
   }
 }
