@@ -7,6 +7,24 @@
 <script nonce="aem">
   // Initialize Adobe Data Layer early to prevent Tags errors
   window.adobeDataLayer = window.adobeDataLayer || [];
+  
+  // Push initial data layer configuration
+  window.adobeDataLayer.push({
+    pageContext: {
+      pageType: 'default',
+      pageName: document.title,
+      pageURL: window.location.href,
+      referrer: document.referrer,
+    },
+    web: {
+      webPageDetails: {
+        name: document.title,
+        URL: window.location.href,
+        server: window.location.hostname,
+        referrer: document.referrer
+      }
+    }
+  });
 </script>
 <script nonce="aem" src="/scripts/aem.js" type="module"></script>
 <script nonce="aem" src="/scripts/scripts.js" type="module"></script>

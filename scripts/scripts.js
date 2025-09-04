@@ -11,7 +11,106 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  getMetadata,
 } from './aem.js';
+
+/**
+ * Initialize Adobe Client Data Layer
+ */
+function initializeDataLayer() {
+  window.adobeDataLayer = window.adobeDataLayer || [];
+  
+  // Push initial page data
+  window.adobeDataLayer.push({
+    pageContext: {
+      pageType: getMetadata('template') || 'default',
+      pageName: document.title,
+      pageURL: window.location.href,
+      referrer: document.referrer,
+    },
+    _experienceplatform: {
+      identification: {
+        core: {
+          ecid: sessionStorage.getItem("com.adobe.reactor.dataElements.ECID") || null
+        }
+      }
+    },
+    web: {
+      webPageDetails: {
+        name: document.title,
+        URL: window.location.href,
+        server: window.location.hostname,
+        referrer: document.referrer
+      }
+    }
+  });
+}
+
+/**
+ * Send PageView event to Adobe Data Layer
+ */
+let pageViewSent = false;
+
+function sendPageViewEvent() {
+  if (!window.adobeDataLayer || pageViewSent) return;
+  
+  window.adobeDataLayer.push({
+    event: 'pageView',
+    eventInfo: {
+      pageName: document.title,
+      pageURL: window.location.href,
+      timestamp: new Date().toISOString()
+    }
+  });
+  
+  pageViewSent = true;
+  console.log('PageView event sent to Adobe Data Layer');
+}
+
+/**
+ * Send click event to Adobe Data Layer
+ * @param {Event} event - The click event
+ * @param {string} elementType - Type of element (button, link, etc.)
+ * @param {string} elementId - ID or identifier of the element
+ */
+function sendClickEvent(event, elementType = 'button', elementId = '') {
+  if (!window.adobeDataLayer) return;
+  
+  const target = event.target;
+  const elementText = target.textContent?.trim() || '';
+  const elementHref = target.href || '';
+  
+  window.adobeDataLayer.push({
+    event: 'click',
+    eventInfo: {
+      elementType: elementType,
+      elementId: elementId || target.id || target.className || 'unknown',
+      elementText: elementText,
+      elementHref: elementHref,
+      timestamp: new Date().toISOString()
+    }
+  });
+  
+  console.log('Click event sent to Adobe Data Layer:', {
+    elementType,
+    elementId: elementId || target.id || target.className || 'unknown',
+    elementText
+  });
+}
+
+/**
+ * Add click event listeners to buttons only
+ * @param {Element} container - Container element to search for clickable elements
+ */
+function addClickListeners(container) {
+  // Add listeners to buttons only
+  const buttons = container.querySelectorAll('button, .button, [role="button"]');
+  buttons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      sendClickEvent(event, 'button', button.id || button.className);
+    });
+  });
+}
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -65,6 +164,9 @@ export function decorateMain(main) {
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
+  
+  // Add click listeners after decoration
+  addClickListeners(main);
 }
 
 /**
@@ -74,6 +176,10 @@ export function decorateMain(main) {
 async function loadEager(doc) {
   document.documentElement.lang = 'en';
   decorateTemplateAndTheme();
+  
+  // Initialize Adobe Data Layer early
+  initializeDataLayer();
+  
   const main = doc.querySelector('main');
   if (main) {
     decorateMain(main);
@@ -161,6 +267,25 @@ async function loadPage() {
   await loadEager(document);
   await loadLazy(document);
   loadDelayed();
+  
+  // Send PageView event when page is fully loaded and Tags are ready
+  const sendPageViewWhenReady = () => {
+    if (tagsLoaded) {
+      // Tags are loaded, send PageView immediately
+      sendPageViewEvent();
+    } else {
+      // Tags not loaded yet, wait a bit more
+      setTimeout(sendPageViewWhenReady, 200);
+    }
+  };
+  
+  if (document.readyState === 'complete') {
+    setTimeout(sendPageViewWhenReady, 500);
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(sendPageViewWhenReady, 500);
+    });
+  }
 }
 
 loadPage();
