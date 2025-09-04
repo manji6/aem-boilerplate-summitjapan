@@ -68,34 +68,49 @@ function sendPageViewEvent() {
 }
 
 /**
- * Send click event to Adobe Data Layer
- * @param {Event} event - The click event
- * @param {string} elementType - Type of element (button, link, etc.)
+ * Send custom event to Adobe Data Layer
+ * @param {Event} event - The event object (optional)
+ * @param {string} eventName - Name of the event
+ * @param {string} elementType - Type of element
  * @param {string} elementId - ID or identifier of the element
+ * @param {Object} additionalData - Additional data to include in the event
  */
-function sendClickEvent(event, elementType = 'button', elementId = '') {
+export function sendCustomEvent(event, eventName, elementType = 'unknown', elementId = '', additionalData = {}) {
   if (!window.adobeDataLayer) return;
   
-  const target = event.target;
+  const target = event?.target || {};
   const elementText = target.textContent?.trim() || '';
   const elementHref = target.href || '';
   
   window.adobeDataLayer.push({
-    event: 'click',
+    event: eventName,
     eventInfo: {
       elementType: elementType,
       elementId: elementId || target.id || target.className || 'unknown',
       elementText: elementText,
       elementHref: elementHref,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      ...additionalData
     }
   });
   
-  console.log('Click event sent to Adobe Data Layer:', {
+  console.log(`${eventName} event sent to Adobe Data Layer:`, {
     elementType,
     elementId: elementId || target.id || target.className || 'unknown',
-    elementText
+    elementText,
+    ...additionalData
   });
+}
+
+/**
+ * Send click event to Adobe Data Layer
+ * @param {Event} event - The click event
+ * @param {string} elementType - Type of element (button, link, etc.)
+ * @param {string} elementId - ID or identifier of the element
+ * @param {Object} additionalData - Additional data to include in the event
+ */
+export function sendClickEvent(event, elementType = 'button', elementId = '', additionalData = {}) {
+  sendCustomEvent(event, 'click', elementType, elementId, additionalData);
 }
 
 /**

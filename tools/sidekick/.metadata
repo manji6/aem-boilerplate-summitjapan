@@ -1,0 +1,5 @@
+# Sidekick Library Content
+# This content should not be indexed for search
+robots: noindex, nofollow
+noindex: true
+nofollow: true
